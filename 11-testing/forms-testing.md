@@ -1,3 +1,55 @@
+<div dir="rtl" align="right">
+
+# فرم را با پر کردن واقعی تست کنیم
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">userEvent</span>](./user-event-and-state-transitions.md)، [تست <span dir="ltr">async</span>](./async-react-testing.md).
+
+فرم فقط تابع <span dir="ltr">submit</span> نیست. اعتبارسنجی، پیام خطا، حالت <span dir="ltr">pending</span>، موفقیت و شکست سرور هم قرارداد تجربه کاربرند.
+
+## مثال اول: ورودی نامعتبر
+
+<div dir="ltr" align="left">
+
+~~~jsx
+// الگوی تست برای فرم واقعی پروژه:
+const user = userEvent.setup();
+render(<RegistrationForm />);
+await user.type(screen.getByLabelText('ایمیل'), 'bad-value');
+await user.click(screen.getByRole('button', { name: 'ثبت‌نام' }));
+expect(await screen.findByText('ایمیل معتبر وارد کنید')).toBeInTheDocument();
+~~~
+
+</div>
+
+<span dir="ltr">RegistrationForm</span> و متن خطا فرضی‌اند و باید با پروژه جایگزین شوند. اگر <span dir="ltr">validation</span> بومی <span dir="ltr">HTML</span> مانع <span dir="ltr">submit</span> می‌شود، انتظار تست باید با همان رفتار سازگار باشد؛ <span dir="ltr">jsdom</span> تمام <span dir="ltr">UI</span> اعتبارسنجی مرورگر را بازسازی نمی‌کند.
+
+## مثال دوم: موفقیت سرور
+
+درخواست را با <span dir="ltr">MSW</span> موفق کن، داده معتبر وارد کن و منتظر پیام موفقیت بمان. تست جدا برای ۴۰۰ یا خطای کسب‌وکار و برای شکست شبکه بنویس؛ همه خطاها لزوماً یک پیام ندارند.
+
+اگر از <span dir="ltr">React Hook Form</span> یا <span dir="ltr">Zod</span> استفاده می‌کنی، معمولاً <span dir="ltr">state</span> داخلی کتابخانه موضوع تست <span dir="ltr">component</span> نیست. اعتبار ورودی، <span dir="ltr">payload</span> مهم و نتیجه‌ای که کاربر می‌بیند را بررسی کن.
+
+## پاسخ مصاحبه و تمرین
+
+برای فرم رمز با حداقل ۸ نویسه، فقط رمز ۲۰نویسه‌ای کافی است؟
+
+<details>
+<summary>پاسخ</summary>
+
+خیر. طول‌های نزدیک مرز مثل ۷، ۸ و ۹ را هم بررسی کن. قواعد دیگر مانند الزام فیلد و خطای سرور جدا هستند.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Testing Forms
 
 Form tests should focus on user-observable behavior:
@@ -1447,3 +1499,9 @@ The goal is to prove that:
 - keyboard submit
 - reset/default values/edit mode
 - file inputs when used
+
+</div>
+
+</details>
+
+</div>

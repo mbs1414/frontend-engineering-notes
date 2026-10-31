@@ -1,3 +1,70 @@
+<div dir="rtl" align="right">
+
+# تست <span dir="ltr">UI</span> وابسته به <span dir="ltr">Query</span> — <span dir="ltr">cache</span> مستقل، شبکه کنترل‌شده
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">TanStack Query</span>](../10-data-fetching/tanstack-query-fundamentals.md)، [<span dir="ltr">MSW</span>](./msw.md).
+
+اگر <span dir="ltr">cache</span> مشترک بین تست‌ها باقی بماند، تست دوم ممکن است به جای درخواست مورد انتظار، داده تست اول را ببیند. برای هر تست <span dir="ltr">QueryClient</span> تازه بساز.
+
+## مثال اول: <span dir="ltr">wrapper</span>
+
+<div dir="ltr" align="left">
+
+~~~jsx
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render } from '@testing-library/react';
+function renderWithQuery(ui) {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return {
+    client,
+    ...render(
+      <QueryClientProvider client={client}>{ui}</QueryClientProvider>,
+    ),
+  };
+}
+~~~
+
+</div>
+
+<span dir="ltr">retry</span> در تست مسیر خطا خاموش است تا چند تلاش پنهان، زمان و انتظار تست را عوض نکنند. این انتخاب تست است؛ تنظیم <span dir="ltr">production</span> را خودکار تغییر نمی‌دهیم.
+
+## مثال دوم: رفتار کاربر
+
+<div dir="ltr" align="left">
+
+~~~jsx
+// با Users واقعی و handler موفق MSW:
+renderWithQuery(<Users />);
+expect(await screen.findByText('Sara')).toBeInTheDocument();
+~~~
+
+</div>
+
+<span dir="ltr">screen</span> و <span dir="ltr">matcher</span>ها نیازمند <span dir="ltr">setup</span> درس <span dir="ltr">RTL</span> هستند. برای <span dir="ltr">mutation</span>، کلیک واقعی، پاسخ کنترل‌شده و نتیجه نهایی <span dir="ltr">UI</span> را بررسی کن. اگر <span dir="ltr">invalidate</span> را <span dir="ltr">mock</span> کنی ولی درخواست و تغییر <span dir="ltr">UI</span> را نبینی، اطمینان محدودتری داری.
+
+## پاسخ مصاحبه و تمرین
+
+چرا تست ۵۰۰ ممکن است دیر به پیام خطا برسد؟
+
+<details>
+<summary>پاسخ</summary>
+
+<span dir="ltr">retry</span> و تأخیرهای آن را بررسی کن. همچنین <span dir="ltr">query function</span> باید پاسخ ۵۰۰ را <span dir="ltr">throw</span> کند؛ <span dir="ltr">fetch</span> به‌تنهایی این کار را نمی‌کند.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Testing TanStack Query Components
 
 Use a fresh `QueryClient` per test/helper to avoid cache pollution between tests. Disable or reduce retries in tests when retries would unnecessarily slow expected failure scenarios.
@@ -497,3 +564,9 @@ Then render through a provider created for that test.
 ## What to test
 
 Prefer UI behavior driven by query state. For query/mutation integration, MSW can model real request/response behavior without mocking TanStack Query itself.
+
+</div>
+
+</details>
+
+</div>

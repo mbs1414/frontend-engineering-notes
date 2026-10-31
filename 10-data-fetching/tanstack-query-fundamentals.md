@@ -1,3 +1,80 @@
+<div dir="rtl" align="right">
+
+# اولین <span dir="ltr">Query</span> را مرحله‌به‌مرحله بسازیم — <span dir="ltr">TanStack Query</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">Server State</span>](./server-state.md). مثال فارسی از <span dir="ltr">API</span> شیءمحور <span dir="ltr">TanStack Query v5</span> استفاده می‌کند.
+
+## سه جزء لازم
+
+<span dir="ltr">QueryClient cache</span> و عملیات <span dir="ltr">query</span>ها را مدیریت می‌کند. <span dir="ltr">Provider</span> آن را در اختیار درخت <span dir="ltr">React</span> می‌گذارد. <span dir="ltr">useQuery</span> با یک کلید و یک تابع دریافت داده، آن داده را مصرف می‌کند.
+
+<div dir="ltr" align="left">
+
+~~~jsx
+import {
+  QueryClient, QueryClientProvider, useQuery,
+} from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
+
+async function getUsers({ signal }) {
+  const response = await fetch('/api/users', { signal });
+  if (!response.ok) throw new Error('HTTP ' + response.status);
+  return response.json();
+}
+
+function Users() {
+  const query = useQuery({
+    queryKey: ['users'],
+    queryFn: getUsers,
+  });
+  if (query.isPending) return <p>در انتظار داده…</p>;
+  if (query.isError) return <p role="alert">خطا در دریافت</p>;
+  return <ul>{query.data.map(user =>
+    <li key={user.id}>{user.name}</li>
+  )}</ul>;
+}
+
+export default function App() {
+  return <QueryClientProvider client={queryClient}>
+    <Users />
+  </QueryClientProvider>;
+}
+~~~
+
+</div>
+
+این مثال <span dir="ltr">client-only</span> فرض می‌کند /<span dir="ltr">api/users</span> آرایه کاربر معتبر برمی‌گرداند. <span dir="ltr">QueryClient</span> را در هر <span dir="ltr">render</span> دوباره نساز؛ در <span dir="ltr">SSR</span> هم نباید <span dir="ltr">cache</span> خصوصی کاربران را با <span dir="ltr">client</span> مشترک ناخواسته مخلوط کرد.
+
+## کلید و تابع هرکدام چه می‌کنند؟
+
+['<span dir="ltr">users</span>'] هویت داده در <span dir="ltr">cache</span> است؛ <span dir="ltr">getUsers</span> روش دریافت آن است. خود <span dir="ltr">query function</span> باید داده برگرداند یا در شکست <span dir="ltr">throw/reject</span> کند. <span dir="ltr">HTTP 500</span> را باید داخل همان تابع خطا کنی.
+
+## مثال دوم: درخواست اولیه در برابر <span dir="ltr">refetch</span>
+
+در <span dir="ltr">v5</span>، <span dir="ltr">isPending</span> یعنی <span dir="ltr">query</span> داده موفق فعلی ندارد؛ <span dir="ltr">isFetching</span> می‌گوید دریافت در جریان است. <span dir="ltr">isLoading</span> ترکیب <span dir="ltr">pending</span> و <span dir="ltr">fetching</span> است. <span dir="ltr">query</span> غیرفعال ممکن است <span dir="ltr">pending</span> باشد ولی <span dir="ltr">fetching</span> نباشد. در <span dir="ltr">refetch</span>، داده قبلی می‌تواند روی صفحه بماند و نشانگر کوچک تازه‌سازی نمایش داده شود.
+
+## پاسخ مصاحبه و تمرین
+
+دو <span dir="ltr">component</span> با همان <span dir="ltr">key</span>، همان <span dir="ltr">QueryClient</span> و تابع سازگار، باید هرکدام <span dir="ltr">cache</span> مستقل بسازند؟
+
+<details>
+<summary>پاسخ</summary>
+
+خیر. یک هویت <span dir="ltr">cache</span> مشترک دارند و می‌توانند در دریافت در حال اجرا هم شریک شوند؛ <span dir="ltr">refetch</span> بعدی همچنان به <span dir="ltr">freshness</span> و تنظیم‌ها وابسته است.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # TanStack Query Fundamentals
 
 TanStack Query manages **server state**: asynchronous data whose source of truth lives outside the client application.
@@ -538,3 +615,9 @@ The original `Why-React-Query.md` was empty. The key reason is not merely "less 
 2. What does `useQuery` own that plain `fetch` does not?
 3. Why extract a domain-specific query hook?
 4. Why should a query function return/throw predictably?
+
+</div>
+
+</details>
+
+</div>

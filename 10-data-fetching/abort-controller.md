@@ -1,3 +1,73 @@
+<div dir="rtl" align="right">
+
+# وقتی دیگر نتیجه را نمی‌خواهیم — <span dir="ltr">AbortController</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">Fetch</span>](./fetch.md).
+
+## مسئله: کاربر صفحه را ترک کرده
+
+اگر درخواست هنوز لازم نیست، می‌توان از مرورگر خواست آن را لغو کند. <span dir="ltr">AbortController</span> فرمان لغو دارد و <span dir="ltr">signal</span> به عملیات پشتیبانی‌کننده داده می‌شود.
+
+<div dir="ltr" align="left">
+
+~~~js
+const controller = new AbortController();
+fetch('/api/users', { signal: controller.signal })
+  .then(response => {
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return response.json();
+  })
+  .then(console.log)
+  .catch(error => {
+    if (error.name !== 'AbortError') console.error(error);
+  });
+controller.abort();
+~~~
+
+</div>
+
+با لغو، معمولاً <span dir="ltr">rejection</span> مربوط به <span dir="ltr">abort</span> می‌گیریم. این مثال از <span dir="ltr">abort</span> بدون <span dir="ltr">reason</span> سفارشی استفاده می‌کند. <span dir="ltr">signal</span> لغوشده را برای درخواست تازه دوباره استفاده نکن؛ <span dir="ltr">controller</span> تازه بساز.
+
+## مثال دوم: <span dir="ltr">lifecycle</span> در <span dir="ltr">React</span>
+
+<div dir="ltr" align="left">
+
+~~~jsx
+useEffect(() => {
+  const controller = new AbortController();
+  // load باید signal را تا fetch منتقل کند و rejection را رسیدگی کند.
+  load(url, controller.signal);
+  return () => controller.abort();
+}, [url]);
+~~~
+
+</div>
+
+این الگوی اتصال است و <span dir="ltr">load</span> در آن باید تعریف شود؛ نمونه کامل در درس <span dir="ltr">fetch</span> آمده. با عوض شدن <span dir="ltr">url</span> یا <span dir="ltr">unmount</span>، عملیات قبلی لغو می‌شود.
+
+لغو <span dir="ltr">client</span> تضمین نمی‌کند سرور کار را انجام نداده باشد. اگر درخواست پرداخت به سرور رسیده، <span dir="ltr">abort</span> معادل <span dir="ltr">rollback</span> تراکنش نیست.
+
+## پاسخ مصاحبه و تمرین
+
+آیا <span dir="ltr">AbortController</span> هر <span dir="ltr">Promise</span> دلخواهی را متوقف می‌کند؟
+
+<details>
+<summary>پاسخ</summary>
+
+خیر. عملیات باید <span dir="ltr">signal</span> را پشتیبانی و رعایت کند. صرف ساختن <span dir="ltr">controller</span> بدون رساندن <span dir="ltr">signal</span> به عملیات اثری ندارد.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # AbortController and Request Cancellation
 
 `AbortController` is a browser API for signaling cancellation to operations that support `AbortSignal`, including `fetch` and many HTTP clients.
@@ -340,3 +410,9 @@ if (error instanceof CanceledError) return;
 ignores expected cancellation errors.
 
 This pattern is commonly used in React applications whenever data is fetched inside `useEffect`.
+
+</div>
+
+</details>
+
+</div>

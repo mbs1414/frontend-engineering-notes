@@ -1,3 +1,56 @@
+<div dir="rtl" align="right">
+
+# چه چیزی را در چه سطحی تست کنیم؟ — <span dir="ltr">Test Strategy</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [مبانی تست](./testing-fundamentals.md).
+
+<span dir="ltr">Unit</span>، <span dir="ltr">Integration</span> و <span dir="ltr">E2E</span> دامنه متفاوت دارند. واحد کوچک سریع‌تر عیب‌یابی می‌شود؛ <span dir="ltr">integration</span> همکاری چند بخش را می‌سنجد؛ <span dir="ltr">E2E</span> مسیر کاربر را در مرورگر و مجموعه بزرگ‌تری از سیستم بررسی می‌کند.
+
+## مثال اول: فرم ورود
+
+| قانون | سطح مناسب اولیه |
+| --- | --- |
+| تابع تشخیص ایمیل خالی | <span dir="ltr">unit</span> |
+| پر کردن فرم و نمایش خطای <span dir="ltr">API</span> | <span dir="ltr">component/integration</span> |
+| ورود واقعی و دیدن داشبورد | <span dir="ltr">E2E</span> محدود و مهم |
+
+<span dir="ltr">Pyramid</span> و <span dir="ltr">Trophy</span> مدل تصمیم‌گیری درباره ترکیب تست‌ها هستند، نه دستور درصد ثابت برای همه تیم‌ها. هزینه اجرا، اطمینان مورد نیاز و احتمال خطا تعیین‌کننده‌اند.
+
+## مثال دوم: <span dir="ltr">coverage</span> گمراه‌کننده
+
+<div dir="ltr" align="left">
+
+~~~js
+function divide(a, b) { return a / b; }
+// این فراخوانی ممکن است خط تابع را پوشش دهد:
+divide(6, 2);
+~~~
+
+</div>
+
+پوشش خط بالا ثابت نمی‌کند قرارداد تقسیم بر صفر یا ورودی نامعتبر درست است. <span dir="ltr">coverage</span> نشان می‌دهد چه کدی اجرا شده، نه کیفیت همه ادعاها.
+
+## پاسخ مصاحبه و تمرین
+
+برای هر ترکیب ممکن فرم یک تست <span dir="ltr">E2E</span> بنویسیم؟
+
+<details>
+<summary>پاسخ</summary>
+
+معمولاً نه. ترکیب‌های محلی را در سطح مناسب سریع‌تر بررسی کن و مسیرهای بحرانی را با چند <span dir="ltr">E2E</span> قابل اعتماد پوشش بده.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Testing Strategy: Pyramid, Trophy, and Tooling
 
 ## Test levels
@@ -1081,3 +1134,9 @@ Why?
 2. Testing pyramid vs testing trophy?
 3. Why is 100% coverage not proof of correctness?
 4. What should determine where you invest testing effort?
+
+</div>
+
+</details>
+
+</div>

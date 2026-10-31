@@ -1,3 +1,72 @@
+<div dir="rtl" align="right">
+
+# تستی که واقعاً یک ثانیه منتظر نمی‌ماند — <span dir="ltr">Fake Timers</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">Vitest</span>](./vitest.md)، <span dir="ltr">timer</span> در <span dir="ltr">JavaScript</span>.
+
+برای <span dir="ltr">debounce</span> یا انقضا، منتظر زمان واقعی ماندن تست را کند و ناپایدار می‌کند. <span dir="ltr">Fake timer</span> به تست اجازه می‌دهد ساعت شبیه‌سازی‌شده را جلو ببرد.
+
+## مثال اول: مرز زمان
+
+<div dir="ltr" align="left">
+
+~~~js
+import { expect, it, vi } from 'vitest';
+it('runs after one second', () => {
+  vi.useFakeTimers();
+  try {
+    const callback = vi.fn();
+    setTimeout(callback, 1000);
+    vi.advanceTimersByTime(999);
+    expect(callback).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(callback).toHaveBeenCalledTimes(1);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+~~~
+
+</div>
+
+دو <span dir="ltr">assertion</span> نشان می‌دهند <span dir="ltr">callback</span> زودتر از قرارداد اجرا نشده و در مرز لازم اجرا شده است.
+
+## مثال دوم: تاریخ ثابت
+
+<div dir="ltr" align="left">
+
+~~~js
+vi.useFakeTimers();
+vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+expect(Date.now()).toBe(Date.parse('2026-01-01T00:00:00Z'));
+vi.useRealTimers();
+~~~
+
+</div>
+
+در تست واقعی <span dir="ltr">cleanup</span> را حتی هنگام شکست تضمین کن. تغییر <span dir="ltr">system time</span> الزاماً <span dir="ltr">timer</span>ها را اجرا نمی‌کند. برای <span dir="ltr">callback</span>های <span dir="ltr">timer</span> که <span dir="ltr">Promise</span> دارند ممکن است <span dir="ltr">advanceTimersByTimeAsync</span> لازم باشد. [مرجع <span dir="ltr">vi</span>](https://vitest.dev/api/vi.html) جزئیات هر روش را دارد.
+
+## پاسخ مصاحبه و تمرین
+
+بعد از تست <span dir="ltr">timer</span> جعلی را به حالت واقعی برنگردانیم چه می‌شود؟
+
+<details>
+<summary>پاسخ</summary>
+
+تست‌های بعدی ممکن است رفتار زمانی متفاوت یا <span dir="ltr">timeout</span> داشته باشند. وضعیت مشترک را پاک‌سازی کن.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Fake Timers and Dates
 
 Tests involving time should be deterministic. Freeze time when calendar/date logic is under test, and use fake timers when timer scheduling is part of the behavior.
@@ -565,3 +634,9 @@ Controlled time leads to reliable, repeatable, and trustworthy tests.
 Depending on the test, useful controls include advancing time by a specific amount, running pending timers, or restoring real timers in cleanup.
 
 Be careful with `userEvent` plus fake timers: simulated user interactions may schedule timers, so configure/advance them intentionally rather than leaving the test suspended in temporal purgatory.
+
+</div>
+
+</details>
+
+</div>

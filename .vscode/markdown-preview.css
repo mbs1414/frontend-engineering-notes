@@ -1,0 +1,42 @@
+/* Direction belongs to each section, rather than the whole preview window. */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="ltr"] {
+  text-align: left;
+}
+
+/* Keep Latin terms and inline expressions separate from surrounding Persian. */
+span[dir="ltr"],
+:not(pre) > code {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* Override inherited RTL and alignment from Markdown themes/extensions. */
+pre,
+pre code,
+.hljs,
+.vscode-code-block {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: isolate;
+}
+
+pre {
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* Use the current section's direction for both Persian and archived English. */
+body th,
+body td {
+  text-align: start;
+}
+
+ul,
+ol {
+  padding-inline-start: 2em;
+  padding-inline-end: 0;
+}

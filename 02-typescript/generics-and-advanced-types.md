@@ -1,3 +1,113 @@
+<div dir="rtl" align="right">
+
+# یک تابع برای چند نوع، با حفظ ارتباط — <span dir="ltr">Generics</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [انواع پایه](./fundamentals.md) و [<span dir="ltr">Narrowing</span>](./narrowing-and-type-guards.md).
+
+## <span dir="ltr">Generic</span> چه مشکلی را حل می‌کند؟
+
+تابعی می‌خواهیم که اولین عضو آرایه را بدهد. اگر <span dir="ltr">any</span> بنویسیم، رابطه بین ورودی و خروجی را از دست می‌دهیم. <span dir="ltr">T</span> یک نام موقت برای نوع است؛ مثل پارامتر تابع، ولی برای <span dir="ltr">type checker</span>.
+
+<div dir="ltr" align="left">
+
+~~~ts
+function first<T>(items: T[]): T | undefined {
+  return items[0];
+}
+const firstName = first(['Sara', 'Ali']); // string | undefined
+const id = first([10, 20]);         // number | undefined
+~~~
+
+</div>
+
+نوع خروجی از نوع اعضای ورودی پیروی می‌کند. <span dir="ltr">undefined</span> را هم نگه داشتیم چون آرایه ممکن است خالی باشد.
+
+## محدودیت روی نوع — <span dir="ltr">Constraint</span>
+
+<div dir="ltr" align="left">
+
+~~~ts
+function getId<T extends { id: number }>(item: T) {
+  return item.id;
+}
+getId({ id: 1, name: 'Sara' }); // 1
+// getId({ name: 'Sara' }); // خطا: id ندارد
+~~~
+
+</div>
+
+<span dir="ltr">extends</span> اینجا می‌گوید <span dir="ltr">T</span> باید حداقل <span dir="ltr">id</span> عددی داشته باشد؛ به معنی اجبار به ارث‌بری از یک کلاس نیست.
+
+## <span dir="ltr">keyof</span> و ارتباط کلید با خروجی
+
+<div dir="ltr" align="left">
+
+~~~ts
+function getProperty<T, K extends keyof T>(object: T, key: K): T[K] {
+  return object[key];
+}
+const person = { name: 'Sara', age: 24 };
+const age = getProperty(person, 'age'); // number
+// getProperty(person, 'phone'); // خطا
+~~~
+
+</div>
+
+<span dir="ltr">keyof</span> کلیدهای مجاز را می‌دهد. <span dir="ltr">T</span>[<span dir="ltr">K</span>] نوع <span dir="ltr">property</span> انتخاب‌شده است. <span dir="ltr">generic</span> اینجا فقط برای «قابل استفاده مجدد بودن» نیست؛ ارتباط دقیق کلید و مقدار را هم حفظ می‌کند.
+
+## ابزارهای پرکاربرد
+
+<div dir="ltr" align="left">
+
+~~~ts
+type User = { id: number; name: string; email: string };
+type UserPreview = Pick<User, 'id' | 'name'>;
+type NewUser = Omit<User, 'id'>;
+type UserPatch = Partial<NewUser>;
+type ReadonlyUser = Readonly<User>;
+~~~
+
+</div>
+
+<span dir="ltr">Pick</span> چند <span dir="ltr">property</span> را انتخاب می‌کند؛ <span dir="ltr">Omit</span> حذفشان می‌کند؛ <span dir="ltr">Partial</span> همه را اختیاری می‌کند. <span dir="ltr">Readonly</span> در سطح <span dir="ltr">type</span> جلوی <span dir="ltr">assignment</span> را می‌گیرد و خودبه‌خود <span dir="ltr">deep freeze</span> نیست. <span dir="ltr">Required</span> اختیاری بودن را برمی‌دارد؛ <span dir="ltr">ReturnType</span> و <span dir="ltr">Parameters</span> خروجی و پارامترهای تابع را استخراج می‌کنند؛ <span dir="ltr">Awaited</span> نوع نتیجه انتظار برای <span dir="ltr">Promise</span> را مدل می‌کند.
+
+## مباحث مرحله دوم
+
+<div dir="ltr" align="left">
+
+~~~ts
+type Optional<T> = { [K in keyof T]?: T[K] };
+type ArrayElement<T> = T extends Array<infer Item> ? Item : T;
+type NumberItem = ArrayElement<number[]>; // number
+~~~
+
+</div>
+
+اولی **<span dir="ltr">Mapped Type</span>** است: روی کلیدهای یک نوع حرکت می‌کند. دومی **<span dir="ltr">Conditional Type</span>** است: بر اساس شکل نوع تصمیم می‌گیرد. <span dir="ltr">infer</span> نوع داخل آرایه را استخراج می‌کند. فعلاً لازم نیست این‌ها را حفظ کنی؛ اول مثال <span dir="ltr">getProperty</span> را خودت توضیح بده.
+
+## پاسخ مصاحبه و تمرین
+
+**<span dir="ltr">Generic</span> جای اعتبارسنجی <span dir="ltr">API</span> را می‌گیرد؟** خیر. <span dir="ltr">`fetchJson0()`</span> می‌تواند نوع ادعایی بدهد، ولی ساختار پاسخ واقعی باید جدا بررسی شود.
+
+برای فرم ویرایش که <span dir="ltr">name</span> و <span dir="ltr">email</span> هر دو می‌توانند حذف شوند، چه نوعی مناسب است؟
+
+<details>
+<summary>پاسخ</summary>
+
+<span dir="ltr">`Partial0>`</span>. این فقط شکل مجاز داده در <span dir="ltr">TypeScript</span> را تعیین می‌کند؛ قواعد اعتبار داده همچنان جدا هستند.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Generics & Advanced Types
 
 ## Generics
@@ -579,3 +689,9 @@ This is one of the most important TypeScript patterns used in professional React
 ### Important correction
 
 If a custom effect depends on an `endpoint`, `id`, filters, or other external values, those values belong in the effect dependency model. A hard-coded empty dependency array means the effect will not rerun when those inputs change.
+
+</div>
+
+</details>
+
+</div>

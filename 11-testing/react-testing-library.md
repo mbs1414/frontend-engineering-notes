@@ -1,3 +1,70 @@
+<div dir="rtl" align="right">
+
+# تست <span dir="ltr">component</span> از نگاه کاربر — <span dir="ltr">React Testing Library</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">Vitest</span>](./vitest.md)، <span dir="ltr">React</span> و [راه‌اندازی محیط تمرین](./practice-setup.md).
+
+<span dir="ltr">RTL</span> صفحه <span dir="ltr">render</span>شده را جست‌وجو می‌کند. به‌جای <span dir="ltr">state</span> خصوصی <span dir="ltr">component</span>، متن، نقش کنترل و نتیجه تعامل را می‌سنجیم.
+
+## مثال اول: یک تست کامل دکمه
+
+<div dir="ltr" align="left">
+
+~~~jsx
+import { useState } from 'react';
+import { expect, it } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(c => c + 1)}>
+    Count: {count}
+  </button>;
+}
+it('increments after clicking', async () => {
+  const user = userEvent.setup();
+  render(<Counter />);
+  await user.click(screen.getByRole('button', { name: 'Count: 0' }));
+  expect(screen.getByRole('button', { name: 'Count: 1' })).toBeInTheDocument();
+});
+~~~
+
+</div>
+
+<span dir="ltr">getByRole</span> از نقش و <span dir="ltr">accessible name</span> استفاده می‌کند. این روش با رفتار کاربر و کیفیت <span dir="ltr">semantic UI</span> مرتبط است؛ <span dir="ltr">test-id</span> برای مواقع نیاز باقی می‌ماند.
+
+## مثال دوم: سه خانواده <span dir="ltr">query</span>
+
+| روش | اگر عنصر نباشد | کاربرد |
+| --- | --- | --- |
+| <span dir="ltr">getBy</span>... | خطا | باید همین حالا وجود داشته باشد |
+| <span dir="ltr">queryBy</span>... | <span dir="ltr">null</span> | بررسی نبودن |
+| <span dir="ltr">findBy</span>... | منتظر می‌ماند و در شکست <span dir="ltr">reject</span> می‌شود | ظاهر شدن غیرهم‌زمان |
+
+<span dir="ltr">findBy</span> را <span dir="ltr">await</span> کن. این تمایز در [مرجع <span dir="ltr">Query</span>ها](https://testing-library.com/docs/queries/about/) توضیح داده شده است.
+
+## پاسخ مصاحبه و تمرین
+
+برای <span dir="ltr">assert</span> نبودن <span dir="ltr">alert</span> از <span dir="ltr">getByRole</span> استفاده کنیم؟
+
+<details>
+<summary>پاسخ</summary>
+
+از <span dir="ltr">queryByRole</span> استفاده کن: <span dir="ltr">`expect(screen.queryByRole('alert')).not.toBeInTheDocument()`</span>. <span dir="ltr">getBy</span> پیش از رسیدن به <span dir="ltr">assertion</span>، خطا می‌دهد.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # React Testing Library
 
 React Testing Library encourages tests that interact with rendered UI similarly to users and assistive technologies.
@@ -1351,3 +1418,9 @@ Remove once tests are working correctly.
 ## Useful query you should also know
 
 `within(container)` scopes queries to a specific section/row/dialog when the page contains repeated accessible elements.
+
+</div>
+
+</details>
+
+</div>

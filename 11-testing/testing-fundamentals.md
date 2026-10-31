@@ -1,3 +1,82 @@
+<div dir="rtl" align="right">
+
+# تست را از یک رفتار واقعی شروع کنیم — <span dir="ltr">Testing Fundamentals</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** تابع، شرط و خطا در <span dir="ltr">JavaScript</span>. مثال‌ها با <span dir="ltr">Vitest</span> هستند.
+
+## تست یعنی یک ادعای قابل اجرا
+
+می‌خواهیم قانون تخفیف را بدون کلیک دستی هر بار بررسی کنیم. اول قرارداد را روشن می‌کنیم: درصد باید عدد متناهی بین صفر و صد باشد.
+
+<div dir="ltr" align="left">
+
+~~~js
+export function discount(price, percent) {
+  if (!Number.isFinite(price) || price < 0) {
+    throw new Error('Invalid price');
+  }
+  if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
+    throw new Error('Invalid percent');
+  }
+  return price * (1 - percent / 100);
+}
+~~~
+
+</div>
+
+این را در <span dir="ltr">discount.js</span> بگذار. صرف بررسی <span dir="ltr">`percent 0 100`</span>، مقدار <span dir="ltr">null</span>، رشته یا <span dir="ltr">NaN</span> را به‌درستی رد نمی‌کند.
+
+## مثال تست، با سه مرحله
+
+<div dir="ltr" align="left">
+
+~~~js
+import { expect, it } from 'vitest';
+import { discount } from './discount.js';
+
+it('applies a 20 percent discount', () => {
+  const price = 100;                   // Arrange: آماده‌سازی
+  const result = discount(price, 20);   // Act: اجرای رفتار
+  expect(result).toBe(80);             // Assert: بررسی
+});
+it.each([-1, 101, null, NaN])('rejects percent %s', percent => {
+  expect(() => discount(100, percent)).toThrow();
+});
+~~~
+
+</div>
+
+برای تست <span dir="ltr">throw</span> یک تابع به <span dir="ltr">expect</span> می‌دهیم؛ اگر مستقیم <span dir="ltr">discount</span> را اجرا کنی، خطا پیش از <span dir="ltr">matcher</span> پرتاب می‌شود.
+
+## ورودی معمولی، نامعتبر و مرزی
+
+برای بازه صفر تا صد، خود مرزها و مقادیر نزدیکشان مهم‌اند: -۱، ۰، ۱، ۹۹، ۱۰۰، ۱۰۱. **<span dir="ltr">Boundary Testing</span>** فقط تست ورودی نامعتبر نیست؛ مرز معتبر هم باید بررسی شود. <span dir="ltr">it.each</span> یک رفتار مشترک را با چند ورودی اجرا می‌کند.
+
+تست خوب رفتار قابل مشاهده را پوشش می‌دهد، مستقل است و شکستش معنی دارد. پاس شدن تست‌ها فقط یعنی ادعاهای نوشته‌شده در این اجرا رد نشده‌اند؛ اثبات نبودن همه باگ‌ها نیست.
+
+## پاسخ مصاحبه و تمرین
+
+**<span dir="ltr">Unit</span> چیست؟** یک بخش منسجم قابل آزمون، مثلاً تابع محاسبه؛ لازم نیست واحد را همیشه با یک خط یا یک فایل برابر بگیریم.
+
+اگر قانون سن «۱۸ و بیشتر» است، کدام سه عدد نزدیک مرز را تست می‌کنی؟
+
+<details>
+<summary>پاسخ</summary>
+
+۱۷، ۱۸ و ۱۹؛ این‌ها تفاوت > و >= را آشکار می‌کنند. بسته به قرارداد، نوع نامعتبر و سن منفی هم جدا بررسی می‌شوند.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Testing Fundamentals
 
 ## Core principle
@@ -2469,3 +2548,9 @@ Use a Parameterized Test
 ```
 
 This keeps your test suite cleaner, smaller, and easier to maintain.
+
+</div>
+
+</details>
+
+</div>

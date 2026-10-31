@@ -1,3 +1,63 @@
+<div dir="rtl" align="right">
+
+# تازه بودن با نگه داشتن فرق دارد — <span dir="ltr">staleTime</span> و <span dir="ltr">gcTime</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">Query Key</span>](./query-keys-and-options.md).
+
+## مثال زمانی
+
+<div dir="ltr" align="left">
+
+~~~jsx
+useQuery({
+  queryKey: ['products'],
+  queryFn: getProducts,
+  staleTime: 60_000,
+  gcTime: 5 * 60_000,
+});
+~~~
+
+</div>
+
+<span dir="ltr">getProducts</span> باید تابع دریافت داده باشد. با فرض دریافت موفق در ثانیه صفر، داده تا ۶۰ ثانیه <span dir="ltr">fresh</span> است. بعد <span dir="ltr">stale</span> می‌شود؛ <span dir="ltr">stale</span> شدن به‌تنهایی <span dir="ltr">timer</span> یک درخواست جدید نیست. <span dir="ltr">trigger</span>هایی مانند <span dir="ltr">mount</span> مصرف‌کننده، <span dir="ltr">focus</span> یا <span dir="ltr">reconnect</span>، بسته به تنظیم‌ها می‌توانند <span dir="ltr">refetch</span> کنند.
+
+<span dir="ltr">gcTime</span> مدت نگهداری <span dir="ltr">query</span> **غیرفعال** قبل از جمع‌آوری است؛ <span dir="ltr">countdown</span> مربوط وقتی مصرف‌کننده فعال ندارد اهمیت پیدا می‌کند. این زمان را «مدت اعتبار داده» ننام.
+
+## مثال دوم: برگشت به صفحه
+
+<div dir="ltr" align="left">
+
+~~~text
+داده دریافت شد -> کاربر صفحه را ترک کرد -> query غیرفعال شد
+ -> پیش از gcTime برگشت -> داده cache هنوز ممکن است موجود باشد
+ -> اگر stale و trigger مجاز باشد، refetch پس‌زمینه انجام می‌شود
+~~~
+
+</div>
+
+در <span dir="ltr">v5</span> داده به‌طور پیش‌فرض <span dir="ltr">stale</span> در نظر گرفته می‌شود؛ <span dir="ltr">query</span>های غیرفعال معمول <span dir="ltr">client</span> به‌طور پیش‌فرض ۵ دقیقه نگه داشته می‌شوند. <span dir="ltr">retry</span> پیش‌فرض <span dir="ltr">client</span> می‌تواند خطا را چند بار تکرار کند. این تنظیم‌ها در [<span dir="ltr">Important Defaults</span>](https://tanstack.com/query/latest/docs/framework/react/guides/important-defaults) توضیح داده شده‌اند؛ <span dir="ltr">override</span>های پروژه را بررسی کن.
+
+## پاسخ مصاحبه و تمرین
+
+<span dir="ltr">staleTime</span> یک دقیقه یعنی دقیقاً سر دقیقه درخواست می‌فرستد؟
+
+<details>
+<summary>پاسخ</summary>
+
+خیر. یعنی بعد از آن <span dir="ltr">fresh</span> محسوب نمی‌شود. <span dir="ltr">polling</span> با <span dir="ltr">refetchInterval</span> موضوع جداگانه‌ای است.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Query Caching, Freshness, and Defaults
 
 ## Fresh vs stale
@@ -399,3 +459,9 @@ These concepts work together:
 2. `staleTime` vs `gcTime`?
 3. Why can cached stale data still improve UX?
 4. When should retries be disabled or customized?
+
+</div>
+
+</details>
+
+</div>

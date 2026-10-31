@@ -1,3 +1,72 @@
+<div dir="rtl" align="right">
+
+# پاسخ سرور را در مرز شبکه کنترل کنیم — <span dir="ltr">MSW</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">Fetch</span>](../10-data-fetching/fetch.md)، [<span dir="ltr">Mocking</span>](./mocking.md).
+
+به‌جای <span dir="ltr">mock</span> کردن <span dir="ltr">useQuery</span> یا کل <span dir="ltr">component</span>، <span dir="ltr">MSW</span> درخواست شبکه را <span dir="ltr">intercept</span> می‌کند و پاسخ کنترل‌شده می‌دهد. کد دریافت داده و مدیریت خطای برنامه همچنان مسیر واقعی خودش را طی می‌کند.
+
+## مثال اول: سرور تست
+
+<div dir="ltr" align="left">
+
+~~~js
+import { http, HttpResponse } from 'msw/http';
+import { setupServer } from 'msw/node';
+
+export const server = setupServer(
+  http.get('https://api.example.test/users', () =>
+    HttpResponse.json([{ id: 1, name: 'Sara' }]),
+  ),
+);
+~~~
+
+</div>
+
+<span dir="ltr">import</span> این مثال مطابق [<span dir="ltr">Quick Start</span> فعلی <span dir="ltr">MSW</span>](https://mswjs.io/docs/quick-start) است؛ در یادداشت انگلیسی یا نسخه نصب‌شده قدیمی ممکن است <span dir="ltr">export</span>ها فرق کنند. برنامه تست باید همین <span dir="ltr">URL</span> را درخواست کند؛ آدرس نسبی هم به <span dir="ltr">base URL</span> محیط وابسته است.
+
+## مثال دوم: <span dir="ltr">lifecycle</span> و خطا
+
+<div dir="ltr" align="left">
+
+~~~js
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+
+// در تست مسیر خطا:
+server.use(
+  http.get('https://api.example.test/users', () =>
+    new HttpResponse(null, { status: 500 }),
+  ),
+);
+~~~
+
+</div>
+
+<span dir="ltr">Hook</span>های تست از <span dir="ltr">Vitest</span> وارد می‌شوند. <span dir="ltr">server.use</span> در تست مربوط قرار می‌گیرد. <span dir="ltr">resetHandlers</span> تغییرهای همان تست را پاک می‌کند تا تست بعدی آلوده نشود.
+
+## پاسخ مصاحبه و تمرین
+
+برای حالت «لیست خالی» باید <span dir="ltr">component</span> را <span dir="ltr">mock</span> کنیم؟
+
+<details>
+<summary>پاسخ</summary>
+
+خیر. <span dir="ltr">handler</span> پاسخ آرایه خالی بدهد و <span dir="ltr">component</span> واقعی را <span dir="ltr">render</span> کن؛ سپس <span dir="ltr">empty state</span> را از <span dir="ltr">DOM</span> بررسی کن.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Mock Service Worker (MSW)
 
 MSW intercepts requests at the network boundary, letting application code use its normal `fetch`/client path while tests control responses.
@@ -358,3 +427,9 @@ Faker is useful for generating realistic fixtures, but tests should remain deter
 ## Isolation
 
 Reset request handlers and test data between tests so one test cannot alter another's environment.
+
+</div>
+
+</details>
+
+</div>

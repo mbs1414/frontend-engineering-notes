@@ -1,3 +1,80 @@
+<div dir="rtl" align="right">
+
+# منطق مشترک را استخراج کنیم — <span dir="ltr">Custom Hook</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [قواعد <span dir="ltr">Hook</span>ها](./hooks.md).
+
+## مسئله: چند <span dir="ltr">component</span> اندازه پنجره را می‌خواهند
+
+کپی کردن <span dir="ltr">state</span> و <span dir="ltr">listener</span> در همه <span dir="ltr">component</span>ها، اصلاح <span dir="ltr">cleanup</span> را سخت می‌کند. <span dir="ltr">Custom Hook</span> منطق را در تابعی با نام شروع‌شده با <span dir="ltr">use</span> قرار می‌دهد.
+
+<div dir="ltr" align="left">
+
+~~~jsx
+import { useEffect, useState } from 'react';
+function useWindowWidth() {
+  const [width, setWidth] = useState(null);
+  useEffect(() => {
+    const update = () => setWidth(window.innerWidth);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+  return width;
+}
+function WidthLabel() {
+  const width = useWindowWidth();
+  return <p>{width === null ? 'در حال آماده‌سازی' : width}</p>;
+}
+~~~
+
+</div>
+
+مقدار اولیه <span dir="ltr">null</span> است و خواندن <span dir="ltr">window</span> داخل <span dir="ltr">Effect</span> انجام می‌شود؛ این نمونه در <span dir="ltr">render</span> سرور مستقیماً به <span dir="ltr">window</span> دست نمی‌زند.
+
+## اشتراک منطق با اشتراک <span dir="ltr">state</span> فرق دارد
+
+اگر دو <span dir="ltr">component useWindowWidth</span> را صدا بزنند، هرکدام <span dir="ltr">state</span> و <span dir="ltr">subscription</span> خود را دارند. <span dir="ltr">Hook</span> سفارشی به‌خودی‌خود <span dir="ltr">store</span> مشترک نمی‌سازد. اگر یک <span dir="ltr">subscription</span> مشترک نیاز داری، باید منبع داده مشترک را جدا طراحی کنی.
+
+## مثال دوم: <span dir="ltr">API</span> کوچک و روشن
+
+<div dir="ltr" align="left">
+
+~~~jsx
+function useToggle(initial = false) {
+  const [value, setValue] = useState(initial);
+  const toggle = () => setValue(current => !current);
+  return { value, toggle };
+}
+~~~
+
+</div>
+
+هر فراخوانی <span dir="ltr">useToggle</span> مستقل است. نام و خروجی نشان می‌دهند <span dir="ltr">Hook</span> چه کاری می‌کند؛ لازم نیست برای هر دو خط کد یک <span dir="ltr">abstraction</span> مبهم بسازی.
+
+## پاسخ مصاحبه و تمرین
+
+**چه زمانی <span dir="ltr">custom hook</span> بسازیم؟** وقتی منطق <span dir="ltr">reactive</span> منسجمی را می‌خواهیم قابل استفاده مجدد کنیم یا مسئولیت <span dir="ltr">component</span> را روشن‌تر کنیم؛ نه صرفاً برای کوتاه کردن تعداد خط‌ها.
+
+دو دکمه هرکدام <span dir="ltr">useToggle</span> دارند. کلیک اولی، دومی را هم تغییر می‌دهد؟
+
+<details>
+<summary>پاسخ</summary>
+
+خیر. منطق مشترک است، <span dir="ltr">state</span> مستقل است. برای هماهنگ شدن، <span dir="ltr">state</span> را به مالک مشترک منتقل کن.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Custom Hooks
 
 A custom hook extracts reusable **stateful behavior**. It does not automatically create shared state between callers.
@@ -329,3 +406,9 @@ The hook should care about fetching movies.
 2. Custom hook vs utility function?
 3. What makes a custom hook API maintainable?
 4. Why can stale closures appear inside hooks?
+
+</div>
+
+</details>
+
+</div>

@@ -1,3 +1,68 @@
+<div dir="rtl" align="right">
+
+# آیا این همکاری اتفاق افتاد؟ — <span dir="ltr">Spy</span> و <span dir="ltr">Interaction Testing</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">Mocking</span>](./mocking.md).
+
+گاهی خروجی تابع کافی نیست؛ باید بدانیم پیام ارسال شده یا <span dir="ltr">callback</span> صدا زده شده است. <span dir="ltr">Spy</span> فراخوانی متد موجود را ثبت می‌کند. معمولاً تا وقتی پیاده‌سازی‌اش را عوض نکرده‌ای، رفتار واقعی متد هم اجرا می‌شود.
+
+## مثال اول: مشاهده متد واقعی
+
+<div dir="ltr" align="left">
+
+~~~js
+import { expect, it, vi } from 'vitest';
+it('observes the method', () => {
+  const calculator = { double: number => number * 2 };
+  const spy = vi.spyOn(calculator, 'double');
+  try {
+    expect(calculator.double(3)).toBe(6);
+    expect(spy).toHaveBeenCalledWith(3);
+  } finally {
+    spy.mockRestore();
+  }
+});
+~~~
+
+</div>
+
+برای متد دارای <span dir="ltr">side effect</span> مثل ارسال پیام، صرف <span dir="ltr">spy</span> جلوی ارسال را نمی‌گیرد؛ باید متناسب با محیط جایگزینش کنی.
+
+## مثال دوم: <span dir="ltr">callback</span> قرارداد عمومی
+
+<div dir="ltr" align="left">
+
+~~~js
+const onSuccess = vi.fn();
+onSuccess({ id: 7 });
+expect(onSuccess).toHaveBeenCalledWith({ id: 7 });
+~~~
+
+</div>
+
+این فقط نمایش <span dir="ltr">API</span> است؛ در تست واقعی، به‌جای صدا زدن مستقیم <span dir="ltr">mock</span>، عملی را اجرا کن که باید <span dir="ltr">callback</span> را صدا بزند. وگرنه فقط خود <span dir="ltr">mock</span> را تست کرده‌ای.
+
+## پاسخ مصاحبه و تمرین
+
+آیا تعداد فراخوانی همه <span dir="ltr">helper</span>های خصوصی را <span dir="ltr">assert</span> کنیم؟
+
+<details>
+<summary>پاسخ</summary>
+
+خیر؛ اگر جزئیات پیاده‌سازی باشند، <span dir="ltr">refactor</span> سالم تست را می‌شکند. تعامل‌هایی را بررسی کن که بخشی از قرارداد قابل اتکا هستند.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Spies and Interaction Testing
 
 Interaction testing verifies that collaboration occurred: a dependency was called, called with specific arguments, or called a certain number of times.
@@ -1223,3 +1288,9 @@ Do not test the dependency itself.
 Verify that your unit communicates with it correctly.
 
 This keeps unit tests fast, isolated, and focused on a single responsibility.
+
+</div>
+
+</details>
+
+</div>

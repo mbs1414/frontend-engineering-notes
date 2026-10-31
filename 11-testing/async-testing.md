@@ -1,3 +1,63 @@
+<div dir="rtl" align="right">
+
+# تست باید منتظر نتیجه بماند — <span dir="ltr">Async Testing</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">Promise</span>](../01-javascript/async-javascript.md)، [<span dir="ltr">Vitest</span>](./vitest.md).
+
+تست <span dir="ltr">synchronous</span> می‌تواند پیش از رسیدن <span dir="ltr">Promise</span> تمام شود. باید <span dir="ltr">Promise</span> را <span dir="ltr">return</span> یا <span dir="ltr">await</span> کنی تا <span dir="ltr">runner</span> زمان درستِ موفقیت و شکست را بفهمد.
+
+## مثال اول: انتظار نتیجه موفق
+
+<div dir="ltr" align="left">
+
+~~~js
+import { expect, it } from 'vitest';
+async function getName() { return 'Sara'; }
+it('loads the name', async () => {
+  await expect(getName()).resolves.toBe('Sara');
+});
+~~~
+
+</div>
+
+<span dir="ltr">await</span> را از <span dir="ltr">assertion</span> غیرهم‌زمان حذف نکن. داشتن <span dir="ltr">async</span> روی تابع تست، به‌تنهایی برای <span dir="ltr">Promise</span> رهاشده کافی نیست.
+
+## مثال دوم: انتظار خطا
+
+<div dir="ltr" align="left">
+
+~~~js
+async function fail() { throw new Error('Offline'); }
+it('reports a failure', async () => {
+  await expect(fail()).rejects.toThrow('Offline');
+});
+~~~
+
+</div>
+
+<span dir="ltr">toThrow</span> مستقیم برای تابع <span dir="ltr">synchronous</span> مناسب است؛ <span dir="ltr">rejection</span> با <span dir="ltr">rejects</span> یا <span dir="ltr">try/catch</span> همراه <span dir="ltr">await</span> بررسی می‌شود. اگر <span dir="ltr">try/catch</span> می‌نویسی، مراقب باش در حالت <span dir="ltr">throw</span> نشدن، تست بدون <span dir="ltr">assertion</span> به‌اشتباه پاس نشود.
+
+## پاسخ مصاحبه و تمرین
+
+آیا گذاشتن <span dir="ltr">sleep</span>(1000) در همه تست‌های <span dir="ltr">async</span> راه حل خوبی است؟
+
+<details>
+<summary>پاسخ</summary>
+
+خیر. به نتیجه واقعی یا وضعیت قابل مشاهده منتظر بمان. زمان ثابت هم کند است و هم روی دستگاه کندتر ممکن است کافی نباشد.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Testing Asynchronous JavaScript
 
 Async tests should wait for the actual promise/observable behavior, not arbitrary sleeps.
@@ -590,3 +650,9 @@ This pattern appears constantly when testing APIs, databases, authentication, an
 ## Common failure mode
 
 Forgetting to `await` or return a promise can let a test finish before the assertion runs, producing false confidence.
+
+</div>
+
+</details>
+
+</div>

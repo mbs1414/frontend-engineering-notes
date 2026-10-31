@@ -1,3 +1,70 @@
+<div dir="rtl" align="right">
+
+# وابستگی واقعی را کی جایگزین کنیم؟ — <span dir="ltr">Mocking</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">Vitest</span>](./vitest.md).
+
+فرض کن تابع ثبت سفارش پس از محاسبه، پیام می‌فرستد. در تست محاسبه لازم نیست واقعاً ایمیل بفرستیم. جایگزین کنترل‌شده، تست را قابل تکرار می‌کند؛ ولی اگر همه منطق اصلی را <span dir="ltr">mock</span> کنیم، دیگر همکاری واقعی را نمی‌سنجیم.
+
+## مثال اول: تزریق وابستگی
+
+<div dir="ltr" align="left">
+
+~~~js
+import { expect, it, vi } from 'vitest';
+function placeOrder(order, notify) {
+  if (order.total <= 0) throw new Error('Invalid order');
+  notify(order.id);
+  return 'saved';
+}
+it('notifies after a valid order', () => {
+  const notify = vi.fn();
+  expect(placeOrder({ id: 7, total: 100 }, notify)).toBe('saved');
+  expect(notify).toHaveBeenCalledWith(7);
+});
+~~~
+
+</div>
+
+<span dir="ltr">notify</span> جایگزین شده ولی تصمیم‌گیری <span dir="ltr">placeOrder</span> واقعی است. این مرز روشن، نسبت به <span dir="ltr">mock</span> کردن جزئیات تصادفی کد، نگهداری آسان‌تری دارد.
+
+## مثال دوم: <span dir="ltr">Promise</span> کنترل‌شده
+
+<div dir="ltr" align="left">
+
+~~~js
+const load = vi.fn().mockResolvedValue({ name: 'Sara' });
+// برای مسیر خطا:
+const fail = vi.fn().mockRejectedValue(new Error('Offline'));
+~~~
+
+</div>
+
+این‌ها باید در تست با <span dir="ltr">await</span> مصرف شوند. <span dir="ltr">mock</span> نتیجه واقعی <span dir="ltr">API</span> را اثبات نمی‌کند؛ تست <span dir="ltr">integration</span> قرارداد شبکه یا <span dir="ltr">backend</span> جای جداگانه دارد.
+
+<span dir="ltr">clear</span> تاریخچه فراخوانی، <span dir="ltr">reset</span> پیاده‌سازی <span dir="ltr">mock</span> و <span dir="ltr">restore</span> برگرداندن مورد جاسوسی‌شده را هدف می‌گیرند؛ کاربردشان یکسان نیست.
+
+## پاسخ مصاحبه و تمرین
+
+در تست خطای سرور فرم، خود <span dir="ltr">component</span> فرم را <span dir="ltr">mock</span> کنیم؟
+
+<details>
+<summary>پاسخ</summary>
+
+خیر؛ رفتار فرم موضوع تست است. مرز شبکه را کنترل کن و ببین فرم خطا را چطور به کاربر نشان می‌دهد.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Mocking in Vitest
 
 Mocks are useful at boundaries you intentionally do not want a test to exercise. Over-mocking can produce a beautifully green suite that mostly proves your mocks agree with each other.
@@ -2848,3 +2915,9 @@ This is why `mockClear()` and `clearAllMocks()` are by far the most commonly use
 ## Rule of thumb
 
 Prefer a real implementation when it is fast, deterministic, and part of the behavior under test. Mock unstable/expensive/external boundaries or when isolation is the actual purpose of the test.
+
+</div>
+
+</details>
+
+</div>

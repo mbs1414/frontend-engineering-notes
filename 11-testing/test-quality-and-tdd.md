@@ -1,3 +1,57 @@
+<div dir="rtl" align="right">
+
+# تستی بنویسیم که <span dir="ltr">refactor</span> را تحمل کند — <span dir="ltr">Test Quality</span> و <span dir="ltr">TDD</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [مبانی تست](./testing-fundamentals.md).
+
+## <span dir="ltr">Red</span>، <span dir="ltr">Green</span>، <span dir="ltr">Refactor</span>
+
+در <span dir="ltr">TDD</span> ابتدا یک رفتار کوچک مورد انتظار را با تست شکست‌خورده بیان می‌کنیم؛ بعد حداقل پیاده‌سازی درست را می‌نویسیم؛ سپس با تست‌های پاس‌شده ساختار را بهتر می‌کنیم. این چرخه ابزار طراحی است، نه تضمین خودکار کیفیت.
+
+## مثال اول: تست رفتار
+
+<div dir="ltr" align="left">
+
+~~~js
+// قرارداد تابع تمرینی:
+// total([]) === 0
+// total([{ price: 10, quantity: 2 }]) === 20
+function total(items) {
+  return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+}
+~~~
+
+</div>
+
+تست باید خروجی مورد انتظار را با <span dir="ltr">assertion</span> بررسی کند؛ صرف نوشتن مثال فراخوانی تست کامل نیست.
+
+## مثال دوم: تست شکننده
+
+اگر تست اصرار کند تابع حتماً از <span dir="ltr">reduce</span> استفاده کند، تغییر درست به حلقه <span dir="ltr">for</span> آن را می‌شکند. مگر روش پیاده‌سازی خودش قرارداد باشد، رفتار بیرونی را <span dir="ltr">assert</span> کن.
+
+اسم تست باید شرط و نتیجه را روشن کند، داده کم و مرتبط داشته باشد و بدون وابستگی به ترتیب تست‌ها اجرا شود. <span dir="ltr">snapshot</span> بزرگ و بدون بازبینی می‌تواند تغییر اشتباه را پنهان کند.
+
+## پاسخ مصاحبه و تمرین
+
+اگر تست با تغییر نام متغیر خصوصی شکست بخورد، چه احتمالی وجود دارد؟
+
+<details>
+<summary>پاسخ</summary>
+
+احتمالاً به جزئیات پیاده‌سازی چسبیده است. بررسی کن آیا خروجی یا رفتار قراردادی تغییر کرده؛ تست را حول همان مرز بنویس.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Test Quality, False Results, and TDD
 
 A trustworthy test suite should fail when the protected behavior breaks and remain green when harmless implementation details change.
@@ -1259,3 +1313,9 @@ The second verifies implementation.
 - mutation testing as a way to evaluate assertion strength
 - property-based testing for broad input spaces
 - contract testing for service boundaries
+
+</div>
+
+</details>
+
+</div>

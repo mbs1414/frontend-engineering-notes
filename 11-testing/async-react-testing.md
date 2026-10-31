@@ -1,3 +1,63 @@
+<div dir="rtl" align="right">
+
+# چه زمانی متن نتیجه روی صفحه ظاهر می‌شود؟ — <span dir="ltr">Async React Testing</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">RTL</span>](./react-testing-library.md) و [<span dir="ltr">Async Testing</span>](./async-testing.md).
+
+به‌روزرسانی ناشی از پاسخ شبکه همین لحظه کامل نیست. تست باید به حالت قابل مشاهده منتظر بماند، نه مدت تصادفی.
+
+## مثال اول: نتیجه دریافت
+
+<div dir="ltr" align="left">
+
+~~~jsx
+// الگوی تست componentی به نام Users با API کنترل‌شده:
+render(<Users />);
+expect(screen.getByText('در حال دریافت…')).toBeInTheDocument();
+expect(await screen.findByText('Sara')).toBeInTheDocument();
+~~~
+
+</div>
+
+<span dir="ltr">Users</span> باید <span dir="ltr">component</span> واقعی پروژه باشد و پاسخ <span dir="ltr">API</span> در تست کنترل شود. اگر عنصر از ابتدا موجود است <span dir="ltr">getBy</span>؛ اگر بعداً ظاهر می‌شود <span dir="ltr">findBy</span> مناسب است.
+
+## مثال دوم: انتظار برای <span dir="ltr">assertion</span> دیگر
+
+<div dir="ltr" align="left">
+
+~~~jsx
+await waitFor(() => {
+  expect(onSaved).toHaveBeenCalledWith({ name: 'Sara' });
+});
+~~~
+
+</div>
+
+<span dir="ltr">waitFor</span> از <span dir="ltr">RTL import</span> می‌شود و <span dir="ltr">callback</span> را تا پاس شدن یا <span dir="ltr">timeout</span> تکرار می‌کند. برای ادامه <span dir="ltr">retry</span> معمولاً <span dir="ltr">assertion</span> باید <span dir="ltr">throw</span> کند؛ صرف <span dir="ltr">return false</span> کافی نیست. کلیک و ارسال را بیرون <span dir="ltr">callback</span> بگذار تا با هر <span dir="ltr">retry</span> دوباره اجرا نشوند.
+
+برای ناپدید شدن عنصری که وجود دارد، <span dir="ltr">waitForElementToBeRemoved</span> یا <span dir="ltr">waitFor</span> با <span dir="ltr">query</span> مناسب کمک می‌کند. ابزارهای <span dir="ltr">RTL</span> معمولاً <span dir="ltr">act</span> را پوشش می‌دهند؛ هشدار <span dir="ltr">act</span> را با تأخیر تصادفی پنهان نکن، عملیات منتظرمانده یا <span dir="ltr">timer</span> را پیدا کن.
+
+## پاسخ مصاحبه و تمرین
+
+اگر دکمه فقط بعد از <span dir="ltr">fetch</span> ظاهر می‌شود، <span dir="ltr">getByRole</span> فوری مناسب است؟
+
+<details>
+<summary>پاسخ</summary>
+
+خیر، اگر انتظار ظهور آینده داریم از <span dir="ltr">await screen.findByRole</span> استفاده کن. این انتظار باید نتیجه همان عمل تست باشد، نه پوشاندن یک مشکل مبهم.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Testing Async React UI
 
 Async UI tests should assert the lifecycle users can observe: pending/loading, success, empty, and error states.
@@ -1969,3 +2029,9 @@ This is especially relevant to the later API and React Query topics in the cours
 - Reset temporary MSW handlers between tests.
 - API components commonly need coverage for success, loading, not-found, and error states.
 - This topic connects closely with **MSW**, **Testing Loading and Error States**, and **Testing Asynchronous UI**.
+
+</div>
+
+</details>
+
+</div>

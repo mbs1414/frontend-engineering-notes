@@ -1,3 +1,75 @@
+<div dir="rtl" align="right">
+
+# اجرای اولین تست — <span dir="ltr">Vitest</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [مبانی تست](./testing-fundamentals.md). این مخزن یادداشت است و <span dir="ltr">package</span> تست نصب‌شده ندارد؛ دستورها برای پروژه تمرینی جدا هستند.
+
+## راه‌اندازی حداقلی
+
+<div dir="ltr" align="left">
+
+~~~sh
+npm install -D vitest
+npx vitest run
+~~~
+
+</div>
+
+## مثال اول: تست مستقل
+
+<div dir="ltr" align="left">
+
+~~~js
+// sum.test.js
+import { expect, it } from 'vitest';
+function sum(a, b) { return a + b; }
+it('adds two numbers', () => {
+  expect(sum(2, 3)).toBe(5);
+});
+~~~
+
+</div>
+
+فایل را در پروژه تمرینی بگذار و دستور <span dir="ltr">run</span> را اجرا کن. حالت <span dir="ltr">watch</span> برای تکرار حین توسعه مفید است؛ <span dir="ltr">run</span> یک اجرای تمام‌شونده می‌دهد.
+
+## مثال دوم: هویت با محتوا فرق دارد
+
+<div dir="ltr" align="left">
+
+~~~js
+it('compares array contents', () => {
+  expect([1, 2]).toEqual([1, 2]);
+  expect(0.1 + 0.2).toBeCloseTo(0.3);
+});
+~~~
+
+</div>
+
+<span dir="ltr">toBe</span> برای <span dir="ltr">primitive</span> و هویت مناسب است؛ <span dir="ltr">toEqual</span> محتوای ساختار را بررسی می‌کند. برای اعشار محدودیت نمایش دودویی مهم است.
+
+<span dir="ltr">beforeEach</span> و <span dir="ltr">afterEach</span> آماده‌سازی و پاک‌سازی هر تست‌اند. محیط پیش‌فرض تست لزوماً <span dir="ltr">DOM</span> مرورگر نیست؛ تست <span dir="ltr">component</span> معمولاً به محیط <span dir="ltr">DOM</span> مثل <span dir="ltr">jsdom</span> و تنظیم <span dir="ltr">JSX</span> نیاز دارد. <span dir="ltr">matcher</span>های <span dir="ltr">toBeInTheDocument</span> هم از <span dir="ltr">jest-dom</span> می‌آیند، نه هسته <span dir="ltr">Vitest</span>.
+
+## پاسخ مصاحبه و تمرین
+
+چرا <span dir="ltr">`expect({ id: 1 }).toBe({ id: 1 })`</span> شکست می‌خورد؟
+
+<details>
+<summary>پاسخ</summary>
+
+دو <span dir="ltr">object</span> مستقل‌اند. اگر قرارداد درباره محتواست از <span dir="ltr">toEqual</span> استفاده کن؛ اگر قرارداد هویت مشترک است، <span dir="ltr">toBe</span> مناسب است.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Vitest
 
 Vitest is a Vite-native test framework with familiar Jest-style APIs for tests, assertions, mocks, timers, and coverage.
@@ -1526,3 +1598,9 @@ export default defineConfig({
 ```
 
 Know *why* a React component suite usually needs a DOM-like environment, while pure Node utilities may not.
+
+</div>
+
+</details>
+
+</div>

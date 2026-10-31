@@ -1,3 +1,62 @@
+<div dir="rtl" align="right">
+
+# کلیک تنها یک <span dir="ltr">event</span> نیست — <span dir="ltr">userEvent</span> و تغییر وضعیت
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">RTL</span>](./react-testing-library.md).
+
+کاربر هنگام تایپ و کلیک، مجموعه‌ای از رفتارهای مرورگر را ایجاد می‌کند؛ <span dir="ltr">userEvent</span> تلاش می‌کند تعامل سطح بالاتری را شبیه‌سازی کند. معمولاً یک <span dir="ltr">instance</span> برای هر تست می‌سازیم و تعامل‌ها را <span dir="ltr">await</span> می‌کنیم.
+
+## مثال اول: تایپ
+
+<div dir="ltr" align="left">
+
+~~~jsx
+const user = userEvent.setup();
+render(<input aria-label="نام" />);
+const input = screen.getByRole('textbox', { name: 'نام' });
+await user.type(input, 'Sara');
+expect(input).toHaveValue('Sara');
+~~~
+
+</div>
+
+این بخش داخل تست <span dir="ltr">async</span> با <span dir="ltr">import</span>های درس <span dir="ltr">RTL</span> است. اگر <span dir="ltr">input</span> مقدار قبلی دارد، برای جایگزینی آن <span dir="ltr">user.clear</span> و سپس <span dir="ltr">user.type</span> مناسب است.
+
+## مثال دوم: حالت‌ها را دنبال کن
+
+<div dir="ltr" align="left">
+
+~~~text
+فرم خالی -> تایپ معتبر -> ارسال -> pending -> موفق یا خطا
+~~~
+
+</div>
+
+فقط بررسی <span dir="ltr">callback</span> ارسال کافی نیست؛ ببین کنترل‌ها، پیام‌ها و امکان ارسال دوباره در هر حالت چه رفتاری دارند. برای <span dir="ltr">checkbox</span> از <span dir="ltr">role</span> مناسب و <span dir="ltr">toBeChecked</span>، برای انتخاب از <span dir="ltr">selectOptions</span> و برای <span dir="ltr">Tab</span> از <span dir="ltr">user.tab</span> کمک بگیر.
+
+<span dir="ltr">fireEvent</span> یک <span dir="ltr">event</span> سطح پایین می‌فرستد و هنوز در موارد خاص مفید است؛ به‌تنهایی هم‌معنی یک تعامل کامل کاربر نیست. <span dir="ltr">userEvent</span> هم جای تست مرورگر واقعی برای همه جزئیات <span dir="ltr">platform</span> را نمی‌گیرد.
+
+## پاسخ مصاحبه و تمرین
+
+اگر دکمه هنگام ارسال <span dir="ltr">disabled</span> می‌شود، چه چیزی ارزش تست دارد؟
+
+<details>
+<summary>پاسخ</summary>
+
+هنگام <span dir="ltr">pending</span> دکمه <span dir="ltr">disabled</span> باشد و پس از پایان طبق قرارداد دوباره فعال شود؛ همچنین ارسال تکراری ناخواسته رخ ندهد.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # userEvent and State Transitions
 
 Prefer `userEvent` for realistic interactions such as typing, clicking, tabbing, selecting, and keyboard use. Modern `userEvent` APIs are asynchronous, so create a user instance and `await` interactions.
@@ -1308,3 +1367,9 @@ await user.keyboard('{Enter}');
 ```
 
 A click-only test can miss accessibility and focus bugs that a keyboard-flow test exposes.
+
+</div>
+
+</details>
+
+</div>

@@ -1,3 +1,75 @@
+<div dir="rtl" align="right">
+
+# دو <span dir="ltr">component</span> چطور یک مقدار مشترک داشته باشند؟ — <span dir="ltr">Lifting State</span>
+
+[فهرست درس‌ها](../README.md) · [روش مطالعه](../ROADMAP.md)
+
+**پیش‌نیاز:** [<span dir="ltr">State</span>](./state.md) و <span dir="ltr">props</span>، یعنی ورودی‌هایی که والد به فرزند می‌دهد.
+
+## مسئله: دو <span dir="ltr">input</span> باید هماهنگ باشند
+
+اگر هر <span dir="ltr">input state</span> مستقل داشته باشد، تایپ در اولی دومی را عوض نمی‌کند. <span dir="ltr">state</span> را به والد مشترک می‌بریم و مقدار و <span dir="ltr">handler</span> را به هر دو می‌دهیم. این **<span dir="ltr">Lifting State Up</span>** است.
+
+<div dir="ltr" align="left">
+
+~~~jsx
+import { useState } from 'react';
+function NameInput({ value, onChange }) {
+  return <input aria-label="نام" value={value}
+    onChange={e => onChange(e.target.value)} />;
+}
+export default function Profile() {
+  const [name, setName] = useState('');
+  return <>
+    <NameInput value={name} onChange={setName} />
+    <p>پیش‌نمایش: {name}</p>
+  </>;
+}
+~~~
+
+</div>
+
+مالک مقدار <span dir="ltr">Profile</span> است. <span dir="ltr">NameInput</span> مقدار را مستقیم تغییر نمی‌دهد؛ رویداد تغییر را به مالک خبر می‌دهد. با افزودن <span dir="ltr">NameInput</span> دوم و همان <span dir="ltr">props</span>، هر دو هماهنگ می‌مانند.
+
+## مثال دوم: انتخاب از لیست
+
+<div dir="ltr" align="left">
+
+~~~jsx
+const users = [{ id: 1, name: 'Sara' }, { id: 2, name: 'Ali' }];
+const [selectedId, setSelectedId] = useState(1);
+const selectedUser = users.find(user => user.id === selectedId);
+~~~
+
+</div>
+
+به‌جای نگه داشتن هم <span dir="ltr">id</span> و هم نسخه دیگری از <span dir="ltr">user</span>، فقط <span dir="ltr">id</span> را نگه می‌داریم و بقیه را محاسبه می‌کنیم. اگر داده‌ها تغییر کنند، احتمال ناهماهنگی کمتر است.
+
+## اشتباه رایج و پاسخ مصاحبه
+
+بردن همه <span dir="ltr">state</span>ها به بالاترین <span dir="ltr">component</span> کار را لزوماً بهتر نمی‌کند؛ مالکیت و تعداد مصرف‌کننده‌ها را پیچیده می‌کند. حالت باز بودن یک <span dir="ltr">tooltip</span> معمولاً نزدیک خودش می‌ماند. فیلتر قابل اشتراک با لینک ممکن است در <span dir="ltr">URL</span> مناسب‌تر باشد.
+
+**<span dir="ltr">Single Source of Truth</span> چیست؟** برای هر داده یک مالک مشخص داریم و نسخه‌های مستقلِ هم‌معنا را بی‌دلیل همگام نمی‌کنیم.
+
+## تمرین با پاسخ
+
+یک دکمه در <span dir="ltr">Header</span> باید <span dir="ltr">modal</span> داخل <span dir="ltr">Main</span> را باز کند. <span dir="ltr">state</span> کجا قرار بگیرد؟
+
+<details>
+<summary>پاسخ</summary>
+
+در نزدیک‌ترین والد مشترک <span dir="ltr">Header</span> و <span dir="ltr">Main</span>، یا یک مالک مشترک مناسب اگر فاصله زیاد است. ابتدا ساختار ساده <span dir="ltr">props</span> را امتحان کن؛ صرف داشتن دو مصرف‌کننده الزام به <span dir="ltr">store</span> عمومی نیست.
+
+</details>
+
+---
+
+<!-- ORIGINAL_REFERENCE -->
+<details>
+<summary>متن انگلیسی قبلی — مرجع تکمیلی و اختیاری</summary>
+
+<div dir="ltr" align="left">
+
 # Lifting State and State Design
 
 ## Lifting state up
@@ -509,3 +581,9 @@ React applications become easier to scale when related values are grouped into a
 2. When should state remain local?
 3. Object state vs separate `useState` values?
 4. When would you use URL state or `useReducer` instead?
+
+</div>
+
+</details>
+
+</div>
